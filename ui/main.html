@@ -10,18 +10,18 @@
             background-color: #f4f4f4;
         }
 
-        #search-container {
+        .input-container {
             display: flex;
             margin-bottom: 20px;
         }
 
-        #url-input {
+        input[type="text"] {
             flex: 1;
             padding: 10px;
             font-size: 16px;
         }
 
-        #fetch-button {
+        button {
             padding: 10px 20px;
             font-size: 16px;
             margin-left: 10px;
@@ -42,16 +42,39 @@
 </head>
 <body>
 
-<div id="search-container">
+<div id="search-container" class="input-container">
     <input type="text" id="url-input" placeholder="Gib eine URL ein, z.B. https://api.example.com/data">
     <button id="fetch-button">Fetch</button>
+</div>
+
+<div id="logger-access-container" class="input-container">
+    <input type="text" placeholder="http://localhost:3000/?proxy=http://logger/history" disabled>
+    <button id="logger-access-button">Fetch Logger</button>
 </div>
 
 <div id="result-box">Ergebnis wird hier angezeigt...</div>
 
 <script>
+    const loggerUrl = "http://localhost:3000/?proxy=http://logger/history";
+
     document.getElementById('fetch-button').addEventListener('click', async () => {
         const url = document.getElementById('url-input').value;
+        await fetchProxy(url);
+    });
+
+    document.getElementById('url-input').addEventListener('keypress', async (event) => {
+        if (event.key === 'Enter') {
+            const url = document.getElementById('url-input').value;
+            await fetchProxy(url);
+        }
+    });
+
+    document.getElementById('logger-access-button').addEventListener('click', async () => {
+        await fetchProxy(loggerUrl);
+    });
+
+    async function fetchProxy(url) {
+
         const resultBox = document.getElementById('result-box');
 
         try {
@@ -74,7 +97,7 @@
         } catch (error) {
             resultBox.textContent = 'Fehler beim Laden der URL:\n' + error;
         }
-    });
+    }
 </script>
 
 </body>
