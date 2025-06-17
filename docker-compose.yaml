@@ -1,0 +1,24 @@
+services:
+  public:
+    build:
+      context: .
+      dockerfile: DockerfilePublic
+    container_name: public
+    ports:
+      - "3000:3000"
+    depends_on:
+      - private
+    networks:
+      - app-network
+
+  private:
+    build:
+      context: .
+      dockerfile: DockerfilePrivate
+    container_name: logger
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
