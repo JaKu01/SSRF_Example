@@ -13,14 +13,22 @@ npm start # equals `docker-compose up --build`
 ---
 ## Explanation
 
+### Architecture
+The application consists of two main servers
+- **Logging Server**: Responsible for logging the proxied URLs. It is behind the firewall and therefore not publicly accessible. 
+- **Public Server**: Accepts URLs to proxy and fetches their content. It is not protected by a firewall and can be accessed publicly.
+
+![Architecture](images/SSRF-Vulnerable.svg)
+
+
 ### Logging Server
-- This server logs (and persists) the URLs that are proxied by the public server.
-- Therefore, it provides a /history endpoint
-  - GET `/history` returns the logged URLs as a list
-  - POST `/history` adds a new URL to the history
+This server logs (and persists) the URLs that are proxied by the public server.
+Therefore, it provides the following /history endpoint 
+  - `GET /history` returns the logged URLs as a list
+  - `POST /history` adds a new URL to the history
 
 ### Public Server
-- This server exposes an endpoint that accepts a URL as a query parameter named ```proxy```.
+- This server exposes an endpoint that accepts a URL as a query parameter named `proxy`.
 - It fetches the content of the URL and returns it as a response.
 
 ```bash
@@ -31,6 +39,9 @@ curl "http://localhost:3000/?proxy=https://example.com"
 ### SSRF Attack
 The application is vulnerable to an SSRF Attack by passing the URL of the logging server as the `proxy` parameter. 
 This allows an attacker to read the logs of the logging server which itself is not publicly accessible.
+
+![SSRF Attack](images/SSRF-Attack.svg)
+
 
 ```bash 
 curl "http://localhost:3000/?proxy=http://logger/history"
