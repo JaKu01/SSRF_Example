@@ -2,15 +2,17 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>URL Fetcher</title>
+    <title>SSRF</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 40px;
             background-color: #f4f4f4;
+            position: relative;
+            padding: 10px;
+            box-sizing: border-box;
         }
 
-        .input-container {
+        #input-container {
             display: flex;
             margin-bottom: 20px;
         }
@@ -19,13 +21,33 @@
             flex: 1;
             padding: 10px;
             font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #00509E;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-size: 16px;
             margin-left: 10px;
             cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #003366, #00509E); /* Dark blue gradient */
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #002244, #003F7D); /* Darker blue gradient */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         #result-box {
@@ -35,27 +57,26 @@
             font-family: monospace;
             white-space: pre-wrap;
             background-color: white;
-            border: 1px solid #ccc;
+            border: 1px solid #00509E;
+            box-sizing: border-box;
+            border-radius: 10px;
             overflow: auto;
         }
+
     </style>
 </head>
 <body>
 
-<div id="search-container" class="input-container">
-    <input type="text" id="url-input" placeholder="Gib eine URL ein, z.B. https://api.example.com/data">
-    <button id="fetch-button">Fetch</button>
-</div>
-
-<div id="logger-access-container" class="input-container">
-    <input type="text" placeholder="http://localhost:3000/?proxy=http://logger/history" disabled>
-    <button id="logger-access-button">Fetch Logger</button>
+<div id="input-container">
+    <input type="text" id="url-input" placeholder="Gib eine URL ein, z.B. https://example.com/">
+    <button id="fetch-button"><span class="text">Fetch</span></button>
+    <button id="logger-access-button"><span class="text">Logger</span></button>
 </div>
 
 <div id="result-box">Ergebnis wird hier angezeigt...</div>
 
 <script>
-    const loggerUrl = "http://localhost:3000/?proxy=http://logger/history";
+    const internalLoggerUrl = "http://logger/history"
 
     document.getElementById('fetch-button').addEventListener('click', async () => {
         const url = document.getElementById('url-input').value;
@@ -70,7 +91,7 @@
     });
 
     document.getElementById('logger-access-button').addEventListener('click', async () => {
-        await fetchProxy(loggerUrl);
+        document.getElementById('url-input').value = internalLoggerUrl;
     });
 
     async function fetchProxy(url) {
