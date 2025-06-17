@@ -4,6 +4,11 @@ const axios = require('axios');
 const app = express();
 const PORT = 3000;
 
+app.get('/ui', async (req, res) => {
+    // Serve ui
+    res.sendFile( '/app/ui/main.html');
+});
+
 app.get('/', async (req, res) => {
     try {
         const targetUrl = req.query.proxy;

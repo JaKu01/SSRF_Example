@@ -35,3 +35,8 @@ This allows an attacker to read the logs of the logging server which itself is n
 ```bash 
 curl "http://localhost:3000/?proxy=http://logger/history"
 ```
+
+## UI
+- There is also a simple user interface available at `http://localhost:3000/ui` that allows you to enter a URL and see the response.
+- The URL that you enter will be set as the proxy url.
+  - So if you enter ```https://example.com``` the URL that the ui finally fetches will be `http://localhost:3000/?proxy=https://example.com`.
