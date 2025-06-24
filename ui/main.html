@@ -8,8 +8,13 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             position: relative;
-            padding: 10px;
+            padding: 0;
+            margin: 0;
             box-sizing: border-box;
+        }
+
+        .content-wrapper {
+            padding: 10px;
         }
 
         #input-container {
@@ -63,17 +68,71 @@
             overflow: auto;
         }
 
+        .news-ticker {
+            width: 100%;
+            overflow: hidden;
+            background: #003366;
+            color: #fff;
+            font-family: sans-serif;
+            font-size: 16px;
+            padding: 10px 0;
+            border-top: 2px solid #444;
+            white-space: nowrap;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .ticker-wrapper {
+            display: flex;
+            width: fit-content;
+            animation: scroll linear infinite;
+        }
+
+        .ticker-content span {
+            margin-right: 50px;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+
     </style>
 </head>
 <body>
 
-<div id="input-container">
-    <input type="text" id="url-input" placeholder="Gib eine URL ein, z.B. https://example.com/">
-    <button id="fetch-button"><span class="text">Fetch</span></button>
-    <button id="logger-access-button"><span class="text">Logger</span></button>
+<div class="news-ticker">
+    <div class="ticker-wrapper" id="ticker-wrapper">
+        <div class="ticker-content" id="ticker-content">
+            <span>🕊️ We don’t log. We don’t track. We barely even exist.</span>
+            <span>🧽 Your data is instantly vaporized. Even we can’t find it.</span>
+            <span>🎩 So private, even we don’t know what you're doing. And we love that.</span>
+            <span>🌪️ Logs? What logs? Never heard of them. Not once. Nope.</span>
+            <span>🧘 Total anonymity. Like shouting into the void — if the void was blindfolded.</span>
+            <span>🎁 What you do is your business. We wouldn’t dream of noticing.</span>
+            <span>🫥 Every request is forgotten before it even finishes.</span>
+            <span>📵 We don’t keep logs. We don’t keep cookies. We don’t even keep secrets.</span>
+            <span>🐾 No footprints. No fingerprints. Not even browser prints.</span>
+            <span>🛸 So private, we're not even sure this proxy is real.</span>
+        </div>
+    </div>
 </div>
 
-<div id="result-box">Ergebnis wird hier angezeigt...</div>
+<div class="content-wrapper">
+    <div id="input-container">
+        <input type="text" id="url-input" placeholder="Gib eine URL ein, z.B. https://example.com/">
+        <button id="fetch-button"><span class="text">Fetch</span></button>
+        <button id="logger-access-button"><span class="text">Logger</span></button>
+    </div>
+
+    <div id="result-box">Ergebnis wird hier angezeigt...</div>
+</div>
+
 
 <script>
     const internalLoggerUrl = "http://logger/history"
@@ -119,6 +178,25 @@
             resultBox.textContent = 'Fehler beim Laden der URL:\n' + error;
         }
     }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        const wrapper = document.getElementById("ticker-wrapper");
+        const content = document.getElementById("ticker-content");
+
+        let contentWidth = content.offsetWidth;
+        const containerWidth = document.querySelector(".news-ticker").offsetWidth;
+
+        while (wrapper.offsetWidth < containerWidth * 2) {
+            const clone = content.cloneNode(true);
+            wrapper.appendChild(clone);
+        }
+
+        const totalWidth = wrapper.offsetWidth;
+        const speed = 1000;
+        const duration = totalWidth / speed;
+
+        wrapper.style.animationDuration = `${duration}s`;
+    });
 </script>
 
 </body>
