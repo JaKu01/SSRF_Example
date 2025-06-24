@@ -71,43 +71,35 @@
         .news-ticker {
             width: 100%;
             overflow: hidden;
-            background: #003366;
-            color: #fff;
+            background: #003F7D;
+            color: white;
             font-family: sans-serif;
-            font-size: 16px;
             padding: 10px 0;
-            border-top: 2px solid #444;
+            border-top: 2px solid #333;
+            box-sizing: border-box;
             white-space: nowrap;
             position: relative;
-            margin-bottom: 10px;
         }
 
-        .ticker-wrapper {
+        .ticker-track {
             display: flex;
-            width: fit-content;
-            animation: scroll linear infinite;
+            will-change: transform;
         }
 
         .ticker-content span {
+            display: inline-block;
             margin-right: 50px;
+            font-size: 16px;
         }
 
-        @keyframes scroll {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(-50%);
-            }
-        }
 
 
     </style>
 </head>
 <body>
 
-<div class="news-ticker">
-    <div class="ticker-wrapper" id="ticker-wrapper">
+<div class="news-ticker" id="news-ticker">
+    <div class="ticker-track" id="ticker-track">
         <div class="ticker-content" id="ticker-content">
             <span>🕊️ We don’t log. We don’t track. We barely even exist.</span>
             <span>🧽 Your data is instantly vaporized. Even we can’t find it.</span>
@@ -122,6 +114,7 @@
         </div>
     </div>
 </div>
+
 
 <div class="content-wrapper">
     <div id="input-container">
@@ -178,26 +171,33 @@
             resultBox.textContent = 'Fehler beim Laden der URL:\n' + error;
         }
     }
+</script>
 
+<script>
     window.addEventListener("DOMContentLoaded", () => {
-        const wrapper = document.getElementById("ticker-wrapper");
+        const track = document.getElementById("ticker-track");
         const content = document.getElementById("ticker-content");
 
-        let contentWidth = content.offsetWidth;
-        const containerWidth = document.querySelector(".news-ticker").offsetWidth;
+        const clone = content.cloneNode(true);
+        track.appendChild(clone);
 
-        while (wrapper.offsetWidth < containerWidth * 2) {
-            const clone = content.cloneNode(true);
-            wrapper.appendChild(clone);
+        let position = 0;
+        const speed = 10;
+
+        function loop() {
+            position -= speed;
+            if (Math.abs(position) >= content.offsetWidth) {
+                // Reset position without visible jump
+                position = 0;
+            }
+            track.style.transform = `translateX(${position}px)`;
+            requestAnimationFrame(loop);
         }
 
-        const totalWidth = wrapper.offsetWidth;
-        const speed = 1000;
-        const duration = totalWidth / speed;
-
-        wrapper.style.animationDuration = `${duration}s`;
+        loop();
     });
 </script>
+
 
 </body>
 </html>
