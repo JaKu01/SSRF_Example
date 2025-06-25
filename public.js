@@ -1,5 +1,10 @@
 const express = require('express');
 const axios = require('axios');
+const { URL } = require('url');
+const dns = require('dns').promises;
+const net = require('net');
+const ipaddr = require('ipaddr.js');
+
 
 const app = express();
 const PORT = 3000;
@@ -82,13 +87,15 @@ app.get('/advanced-blacklist', async (req, res) => {
 
 app.get('/sophisticated-blacklist', async (req, res) => {
     try {
+        console.log('Received request for sophisticated blacklist check', req.query.url)
         const targetUrl = req.query.url;
 
         if (!targetUrl) {
             return res.status(400).json({ error: 'url query parameter is required' });
         }
 
-        if (blacklist.some(url => targetUrl.startsWith(url))) {
+        if (!await isSafeUrl(targetUrl)) {
+            console.log(`Blocked access to unsafe URL: ${targetUrl}`);
             return res.status(403).json({ error: 'Hey, thats mean. You tried to access our logg..., ähh nevermind.' });
         }
 
@@ -107,3 +114,46 @@ app.get('/sophisticated-blacklist', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+async function isSafeUrl(rawUrl) {
+    let parsed;
+    try {
+        parsed = new URL(rawUrl);
+    } catch (err) {
+        return false;
+    }
+
+    const host = parsed.hostname;
+
+    // Check if host is an IP address
+    if (net.isIP(host)) {
+        return !isPrivateIp(host);
+    }
+
+    // Otherwise resolve DNS and check all resulting IPs
+    try {
+        const addresses = await dns.resolve(host);
+        const ipv6 = await dns.resolve6(host);
+        const all = [...addresses, ...ipv6];
+
+        return all.every(ip => !isPrivateIp(ip));
+    } catch (err) {
+        return false; // If DNS resolution fails, treat it as unsafe
+    }
+}
+
+function isPrivateIp(ip) {
+    if (!ipaddr.isValid(ip)) {
+        return false
+    }
+
+    const addr = ipaddr.parse(ip);
+    return [
+        'private',
+        'loopback',
+        'linkLocal',
+        'uniqueLocal',
+        'unspecified',
+        'reserved'
+    ].includes(addr.range());
+}
