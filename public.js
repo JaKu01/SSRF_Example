@@ -7,7 +7,7 @@ const PORT = 3000;
 const naiveBlacklist = ["http://logger"]
 const advancedBlacklist = ["http://logger", "http://172.18.0.2"]
 
-app.get('/ui', async (req, res) => {
+app.get('/', async (req, res) => {
     // Serve ui
     res.sendFile( '/app/ui/main.html');
 });
@@ -41,7 +41,7 @@ app.get('/naive-blacklist', async (req, res) => {
         }
 
         if (naiveBlacklist.some(url => targetUrl.startsWith(url))) {
-            return res.status(403).json({ error: 'Hey, thats mean. You tried to access our logging, ähh nevermind.' });
+            return res.status(403).json({ error: 'Hey, thats mean. You tried to access our logg..., ähh nevermind.' });
         }
 
         const historyUrl = 'http://logger/history';
@@ -65,7 +65,7 @@ app.get('/advanced-blacklist', async (req, res) => {
         }
 
         if (advancedBlacklist.some(url => targetUrl.startsWith(url))) {
-            return res.status(403).json({ error: 'Hey, thats mean. You tried to access our logging, ähh nevermind.' });
+            return res.status(403).json({ error: 'Hey, thats mean. You tried to access our logg..., ähh nevermind.' });
         }
 
         const historyUrl = 'http://logger/history';
@@ -89,7 +89,7 @@ app.get('/sophisticated-blacklist', async (req, res) => {
         }
 
         if (blacklist.some(url => targetUrl.startsWith(url))) {
-            return res.status(403).json({ error: 'Hey, thats mean. You tried to access our logging, ähh nevermind.' });
+            return res.status(403).json({ error: 'Hey, thats mean. You tried to access our logg..., ähh nevermind.' });
         }
 
         const historyUrl = 'http://logger/history';
