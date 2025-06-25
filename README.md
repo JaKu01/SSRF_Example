@@ -51,7 +51,7 @@ In this example, the docker internal hostname `logger` is resolved to `10.0.0.67
 
 
 ```bash 
-curl "http://localhost:3000/?proxy=http://logger/history"
+curl "http://localhost:3000/proxy?url=http://logger/history"
 ```
 
 ## Countermeasures 
