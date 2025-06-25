@@ -30,6 +30,14 @@
             border: 1px solid #00509E;
         }
 
+        #logger-access-button {
+            margin-left: 0;
+        }
+
+        #logger-dns-rebind-button {
+            margin-right: auto;
+        }
+
         button {
             padding: 12px 24px;
             font-size: 16px;
@@ -53,6 +61,32 @@
         button:active {
             transform: translateY(0);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .protection-button {
+            padding: 12px 24px;
+            font-size: 16px;
+            margin-left: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #888888, #AAAAAA);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .protection-button:hover, .active-protection-button {
+            background: linear-gradient(135deg, #990000, #CC0000);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
         }
 
         #result-box {
@@ -120,15 +154,59 @@
     <div id="input-container">
         <input type="text" id="url-input" placeholder="Gib eine URL ein, z.B. https://example.com/">
         <button id="fetch-button"><span class="text">Fetch</span></button>
-        <button id="logger-access-button"><span class="text">Logger</span></button>
+    </div>
+    <div class="button-row">
+        <button id="logger-access-button"><span class="text">Use logger url</span></button>
+        <button id="logger-ip-button"><span class="text">Use logger ip</span></button>
+        <button id="logger-dns-rebind-button"><span class="text">Use DNS rebind</span></button>
+
+        <button id="no-protection-button" class="protection-button"><span class="text">No protection</span></button>
+        <button id="naive-protection-button" class="protection-button"><span class="text">Naive protection</span></button>
+        <button id="advanced-protection-button" class="protection-button"><span class="text">Advanced protection</span></button>
+        <button id="sophisticated-protection-button" class="protection-button"><span class="text">Sophisticated protection</span></button>
     </div>
 
     <div id="result-box">Ergebnis wird hier angezeigt...</div>
 </div>
 
+<script>
+    var backendUrl = "http://localhost:3000/proxy?url=";
+
+    const urls = {
+        "no-protection-button": "http://localhost:3000/proxy?url=",
+        "naive-protection-button": "http://localhost:3000/naive-blacklist?url=",
+        "advanced-protection-button": "http://localhost:3000/advanced-blacklist?url=",
+        "sophisticated-protection-button": "http://localhost:3000/sophisticated-blacklist?url="
+    };
+
+    const buttons = document.querySelectorAll(".protection-button");
+
+    function updateActiveButton() {
+        buttons.forEach(button => {
+            if (urls[button.id] === backendUrl) {
+                button.classList.add("active-protection-button");
+            } else {
+                button.classList.remove("active-protection-button");
+            }
+        });
+    }
+
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            backendUrl = urls[button.id];
+            updateActiveButton();
+            console.log(`Backend URL set to: ${backendUrl}`);
+        });
+    });
+
+    updateActiveButton();
+</script>
+
 
 <script>
     const internalLoggerUrl = "http://logger/history"
+    const internalLoggerIp = "http://172.18.0.2/history"
+    const dnsRebindUrl = "http://websec.kurth.dev/history"
 
     document.getElementById('fetch-button').addEventListener('click', async () => {
         const url = document.getElementById('url-input').value;
@@ -146,6 +224,14 @@
         document.getElementById('url-input').value = internalLoggerUrl;
     });
 
+    document.getElementById('logger-ip-button').addEventListener('click', async () => {
+        document.getElementById('url-input').value = internalLoggerIp;
+    });
+
+    document.getElementById('logger-dns-rebind-button').addEventListener('click', async () => {
+        document.getElementById('url-input').value = dnsRebindUrl;
+    });
+
     async function fetchProxy(url) {
 
         const resultBox = document.getElementById('result-box');
@@ -153,7 +239,7 @@
         try {
             resultBox.textContent = 'Lade...';
 
-            const combinedUrl = "http://localhost:3000/?proxy=" + encodeURIComponent(url);
+            const combinedUrl = backendUrl + encodeURIComponent(url);
             console.log("Fetching URL:", combinedUrl);
             const response = await fetch(combinedUrl);
             const contentType = response.headers.get('Content-Type');
